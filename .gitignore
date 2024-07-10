@@ -1,52 +1,72 @@
-# Prerequisites
-*.d
+# Build directories
+Build/
+out/
+build/
 
-# Object files
+# Visual Studio files
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Compiled Object files
+*.slo
+*.lo
 *.o
-*.ko
 *.obj
-*.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
 
 # Precompiled Headers
 *.gch
 *.pch
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
+# Compiled Dynamic libraries
 *.so
-*.so.*
 *.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
 
 # Executables
 *.exe
 *.out
 *.app
-*.i*86
-*.x86_64
-*.hex
+*.pdx
+*.elf
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+# macOS specific
+.DS_Store
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+# Visual Studio Code
+.vscode/
+
+# Temporary files
+*.tmp
+*.log
+
+# Playdate Simulator files
+*.pdx.sim
+
+# Backup files
+*~
+*.bak
+
+# IDE-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Playdate specific
+Simulation/
+sdkpath.txt
