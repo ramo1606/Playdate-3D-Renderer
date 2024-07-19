@@ -27,7 +27,7 @@ set(CMAKE_XCODE_GENERATE_SCHEME TRUE)
 set(PLAYDATE_GAME_NAME 3D_Renderer)
 set(PLAYDATE_GAME_DEVICE 3D_Renderer_DEVICE)
 
-project(${PLAYDATE_GAME_NAME} C)
+project(${PLAYDATE_GAME_NAME} C ASM)
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Source/include)
