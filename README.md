@@ -20,6 +20,33 @@ This project is a 3D software renderer implemented in C89 for the Playdate handh
 - Support for multiple meshes
 - Optimized for Playdate hardware
 
+## Project Structure
+
+```
+Playdate-3D-Renderer/
+│
+├── CMakeLists.txt
+├── README.md
+├── .gitignore
+├── docs/
+└── Source/
+    ├── include/
+    │   ├── display.h
+    ├── src/
+    │   ├── main.c
+    │   ├── display.c
+    ├── lib/
+    ├── assets/
+    │   ├── images/
+    │   ├── sounds/
+    │   ├── music/
+    │   └── levels/
+    └── tests/
+        ├── CMakeLists.txt
+        ├── minunit.h
+        ├── test_display.c
+```
+
 ## Requirements
 
 - Visual Studio 2022
