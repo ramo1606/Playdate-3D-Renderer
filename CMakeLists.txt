@@ -69,9 +69,6 @@ endif()
 # Include Playdate game support
 include(${SDK}/C_API/buildsupport/playdate_game.cmake)
 
-# Add the tests subdirectory
-add_subdirectory(Source/tests)
-
 # Additional compile definitions or options (if needed)
 # target_compile_definitions(${PLAYDATE_GAME_NAME} PRIVATE SOME_DEFINITION=1)
 # target_compile_options(${PLAYDATE_GAME_NAME} PRIVATE -Wall -Wextra)

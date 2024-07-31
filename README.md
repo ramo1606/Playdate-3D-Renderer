@@ -31,20 +31,16 @@ Playdate-3D-Renderer/
 ├── docs/
 └── Source/
     ├── include/
-    │   ├── display.h
+    │   └── display.h
     ├── src/
     │   ├── main.c
-    │   ├── display.c
+    │   └── display.c
     ├── lib/
-    ├── assets/
-    │   ├── images/
-    │   ├── sounds/
-    │   ├── music/
-    │   └── levels/
-    └── tests/
-        ├── CMakeLists.txt
-        ├── minunit.h
-        ├── test_display.c
+    └── assets/
+        ├── images/
+        ├── sounds/
+        ├── music/
+        └── levels/
 ```
 
 ## Requirements
@@ -93,32 +89,6 @@ To build this project, you'll need the Playdate SDK and CMake installed on your 
    ```
 
 7. The output will be a `.pdx` file, which can be run on the Playdate simulator or transferred to a Playdate device.
-
-## Running Tests
-
-This project includes a test suite using the minunit testing framework. To build and run the tests:
-
-1. From the main build directory:
-   ```
-   cmake ..
-   make
-   make test
-   ```
-
-2. Or, to build and run tests directly:
-   ```
-   cd tests
-   cmake .
-   make
-   ./run_tests
-   ```
-
-The test setup is configured in two CMakeLists.txt files:
-
-- The main CMakeLists.txt file in the project root includes the tests subdirectory.
-- The CMakeLists.txt file in the tests directory sets up the test executable and links it with the main project.
-
-If you add new test files or need to include additional resources for testing, you'll need to update the tests/CMakeLists.txt file accordingly.
 
 ## Documentation
 
