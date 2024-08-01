@@ -36,11 +36,19 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Source/lib)
 # Explicitly list header files
 set(HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/display.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/logging.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/memory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/stb_ds.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/triangle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/mesh.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/vector.h
 )
 
 # Explicitly list source files
 set(SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/src/display.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/src/mesh.c
 )
 
 # Main file
