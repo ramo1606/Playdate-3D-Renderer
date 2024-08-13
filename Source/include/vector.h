@@ -30,7 +30,7 @@ typedef struct
  */
 static inline Vector2D vector2DAdd(Vector2D v1, Vector2D v2)
 {
-    return Vector2D { v1.x + v2.x, v1.y + v2.y };
+    return (Vector2D) { v1.x + v2.x, v1.y + v2.y };
 }
 
 /**
@@ -41,7 +41,7 @@ static inline Vector2D vector2DAdd(Vector2D v1, Vector2D v2)
  */
 static inline Vector2D vector2DSub(Vector2D v1, Vector2D v2)
 {
-    return Vector2D { v1.x - v2.x, v1.y - v2.y };
+    return (Vector2D) { v1.x - v2.x, v1.y - v2.y };
 }
 
 /**
@@ -52,7 +52,7 @@ static inline Vector2D vector2DSub(Vector2D v1, Vector2D v2)
  */
 static inline Vector2D vector2DMul(Vector2D v, float scalar)
 {
-    return Vector2D{ v.x * scalar, v.y * scalar };
+    return (Vector2D) { v.x * scalar, v.y * scalar };
 }
 
 /**
@@ -68,7 +68,7 @@ static inline Vector2D vector2DDiv(Vector2D v, float scalar)
         LOG_ERROR("Division by zero in vector2DDiv");
         return v;
     }
-    return Vector2D{ v.x / scalar, v.y / scalar };
+    return (Vector2D) { v.x / scalar, v.y / scalar };
 }
 
 /**
@@ -118,7 +118,7 @@ static inline Vector2D vector2DNormalize(Vector2D v)
  */
 static inline Vector3D vector3DAdd(Vector3D v1, Vector3D v2)
 {
-    return Vector3D { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z };
+    return (Vector3D) { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z };
 }
 
 /**
@@ -129,7 +129,7 @@ static inline Vector3D vector3DAdd(Vector3D v1, Vector3D v2)
  */
 static inline Vector3D vector3DSub(Vector3D v1, Vector3D v2)
 {
-    return Vector3D { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
+    return (Vector3D) { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
 }
 
 /**
@@ -140,7 +140,7 @@ static inline Vector3D vector3DSub(Vector3D v1, Vector3D v2)
  */
 static inline Vector3D vector3DMul(Vector3D v, float scalar)
 {
-    return Vector3D { v.x * scalar, v.y * scalar, v.z * scalar };
+    return (Vector3D) { v.x * scalar, v.y * scalar, v.z * scalar };
 }
 
 /**
@@ -156,7 +156,7 @@ static inline Vector3D vector3DDiv(Vector3D v, float scalar)
         LOG_ERROR("Division by zero in vector3DDiv");
         return v;
     }
-    return Vector3D{ v.x / scalar, v.y / scalar, v.z / scalar };
+    return (Vector3D) { v.x / scalar, v.y / scalar, v.z / scalar };
 }
 
 /**
@@ -178,7 +178,7 @@ static inline float vector3DDot(Vector3D v1, Vector3D v2)
  */
 static inline Vector3D vector3DCross(Vector3D v1, Vector3D v2)
 {
-    return Vector3D
+    return (Vector3D)
     {
         v1.y * v2.z - v1.z * v2.y,
         v1.z * v2.x - v1.x * v2.z,
@@ -224,7 +224,7 @@ static inline Vector3D vector3DRotateX(Vector3D v, float angle)
 {
     float cosA = cosf(angle);
     float sinA = sinf(angle);
-    return Vector3D
+    return (Vector3D)
     {
         v.x,
         v.y * cosA - v.z * sinA,
@@ -242,7 +242,7 @@ static inline Vector3D vector3DRotateY(Vector3D v, float angle)
 {
     float cosA = cosf(angle);
     float sinA = sinf(angle);
-    return Vector3D
+    return (Vector3D)
     {
         v.x * cosA + v.z * sinA,
         v.y,
@@ -260,7 +260,7 @@ static inline Vector3D vector3DRotateZ(Vector3D v, float angle)
 {
     float cosA = cosf(angle);
     float sinA = sinf(angle);
-    return Vector3D
+    return (Vector3D)
     {
         v.x * cosA - v.y * sinA,
         v.x * sinA + v.y * cosA,

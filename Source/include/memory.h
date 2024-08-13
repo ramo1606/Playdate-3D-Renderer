@@ -3,9 +3,7 @@
 
 #include "pd_api.h"
 #include "logging.h" 
-
-/* Extern declaration for the PlaydateAPI singleton */
-extern PlaydateAPI* pd;
+#include "global.h"
 
 /* Function Declarations */
 
@@ -55,7 +53,7 @@ static inline void* pdCalloc(size_t count, size_t size)
     }
     else
     {
-        LOG_ERROR("pdCalloc: Memory allocation failed for size %zu * %zu", num, size);
+        LOG_ERROR("pdCalloc: Memory allocation failed for size %zu * %zu", count, size);
     }
     return ptr;
 }
