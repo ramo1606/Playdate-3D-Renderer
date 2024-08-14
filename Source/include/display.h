@@ -38,7 +38,15 @@ void drawLine(int x0, int y0, int x1, int y1, LCDSolidColor color);
  * @param triangle The triangle to draw.
  * @param color Color of the triangle (kColorBlack or kColorWhite).
  */
-void drawTriangle(Triangle2D triangle, LCDSolidColor color);
+void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, LCDSolidColor color);
+
+/**
+ * @brief Draws a filled triangle.
+ *
+ * @param triangle The triangle to draw.
+ * @param color Color of the triangle (kColorBlack or kColorWhite).
+ */
+void drawFilledTriangle(int x0, int y0, int x1, int y1, int x2, int y2, LCDSolidColor color);
 
 /**
  * @brief Draws a rectangle.

@@ -186,7 +186,15 @@ void render(void)
         Triangle2D triangle = trianglesToRender[i];
 
         // Draw the triangle
-        drawTriangle(triangle, kColorWhite);
+        drawFilledTriangle(triangle.points[0].x, triangle.points[0].y, 
+                           triangle.points[1].x, triangle.points[1].y,
+                           triangle.points[2].x, triangle.points[2].y, 
+                           kColorWhite);
+
+        drawTriangle(triangle.points[0].x, triangle.points[0].y,
+                     triangle.points[1].x, triangle.points[1].y,
+                     triangle.points[2].x, triangle.points[2].y,
+                     kColorBlack);
     }
 
     // Update the Playdate display

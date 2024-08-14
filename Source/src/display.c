@@ -45,6 +45,7 @@ void drawPixel(int x, int y, LCDSolidColor color)
 
 void drawLine(int x0, int y0, int x1, int y1, LCDSolidColor color)
 {
+    // Bresenham's line algorithm
     int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
     int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
     int err = dx + dy, e2; /* error value e_xy */
@@ -67,14 +68,94 @@ void drawLine(int x0, int y0, int x1, int y1, LCDSolidColor color)
     }
 }
 
-void drawTriangle(Triangle2D triangle, LCDSolidColor color)
+void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, LCDSolidColor color)
 {
-    drawLine((int)triangle.points[0].x, (int)triangle.points[0].y,
-        (int)triangle.points[1].x, (int)triangle.points[1].y, color);
-    drawLine((int)triangle.points[1].x, (int)triangle.points[1].y,
-        (int)triangle.points[2].x, (int)triangle.points[2].y, color);
-    drawLine((int)triangle.points[2].x, (int)triangle.points[2].y,
-        (int)triangle.points[0].x, (int)triangle.points[0].y, color);
+    drawLine(x0, y0, x1, y1, color);
+    drawLine(x1, y1, x2, y2, color);
+    drawLine(x2, y2, x0, y0, color);
+}
+
+void fillFlatBottomTriangle(int x0, int y0, int x1, int y1, int x2, int y2, LCDSolidColor color)
+{
+    // Calculate the inverse slopes
+    float invslope1 = (float)(x1 - x0) / (float)(y1 - y0);
+    float invslope2 = (float)(x2 - x0) / (float)(y2 - y0);
+
+    // Initialize the current x values
+    float xStart = x0;
+    float xEnd = x0;
+
+	// Draw the triangle
+    for (int scanlineY = y0; scanlineY <= y1; scanlineY++)
+	{
+		drawLine((int)xStart, scanlineY, (int)xEnd, scanlineY, color);
+        xStart += invslope1;
+        xEnd += invslope2;
+	}
+}
+
+void fillFlatTopTriangle(int x0, int y0, int x1, int y1, int x2, int y2, LCDSolidColor color)
+{
+	// Calculate the inverse slopes
+    float invslope1 = (float)(x2 - x0) / (float)(y2 - y0);
+    float invslope2 = (float)(x2 - x1) / (float)(y2 - y1);
+
+    // Initialize the current x values
+    float xStart = x2;
+    float xEnd = x2;
+
+    // Draw the triangle
+    for (int scanlineY = y2; scanlineY > y0; scanlineY--)
+	{
+		drawLine((int)xStart, scanlineY, (int)xEnd, scanlineY, color);
+		xStart -= invslope1;
+		xEnd -= invslope2;
+	}
+}
+
+void intSwap(int* a, int* b)
+{
+	int temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
+void drawFilledTriangle(int x0, int y0, int x1, int y1, int x2, int y2, LCDSolidColor color)
+{
+	// Sort the vertices by y-coordinate
+    if (y0 > y1) 
+    {
+		intSwap(&y0, &y1);
+		intSwap(&x0, &x1);
+    }
+	if(y0 > y2) 
+    {
+        intSwap(&y0, &y2);
+        intSwap(&x0, &x2);
+    }
+	if(y1 > y2) 
+    {
+		intSwap(&y1, &y2);
+		intSwap(&x1, &x2);
+    }
+
+    if (y1 == y2) 
+    {
+        fillFlatBottomTriangle(x0, y0, x1, y1, x2, y2, color);
+	}
+	else if (y0 == y1) 
+	{
+		fillFlatTopTriangle(x0, y0, x1, y1, x2, y2, color);
+    }
+    else
+    {
+        // Calculate the new vertex (Mx, My) using triangle similarity
+        int Mx = x0 + ((float)(y1 - y0) / (float)(y2 - y0)) * (x2 - x0);
+        int My = y1;
+
+        fillFlatBottomTriangle(x0, y0, x1, y1, Mx, My, color);
+        fillFlatTopTriangle(x1, y1, Mx, My, x2, y2, color);
+    }
 }
 
 void drawRect(int x, int y, int width, int height, LCDSolidColor color)
