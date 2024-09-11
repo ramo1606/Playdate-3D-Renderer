@@ -5,6 +5,20 @@
 #include "vector.h"
 #include "triangle.h"
 
+enum cullingMode
+{
+	kCullingNone,
+	kCullingBackface
+} cullingMode;
+
+enum renderMode
+{
+	kRenderWireframe,
+	kRenderWireframeVertex,
+	kRenderSolid,
+	kRenderSolidWireframe
+} renderMode;
+
 /**
  * @brief Initializes the display system.
  *

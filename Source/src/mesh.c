@@ -1,8 +1,47 @@
 #include "global.h"
 #include "mesh.h"
+#include "patterns.h"
 #include "logging.h"
 #include "memory.h"
 #include "stb_ds.h"
+
+/* Constants for cube mesh */
+#define N_CUBE_VERTICES 8
+#define N_CUBE_FACES (6 * 2) /* 6 cube faces, 2 triangles per face */
+
+/* Cube vertices */
+Vector3D cubeVertices[N_CUBE_VERTICES] = {
+    {.x = -1, .y = -1, .z = -1 }, /* 1 */
+    {.x = -1, .y = 1, .z = -1 }, /* 2 */
+    {.x = 1, .y = 1, .z = -1 }, /* 3 */
+    {.x = 1, .y = -1, .z = -1 }, /* 4 */
+    {.x = 1, .y = 1, .z = 1 }, /* 5 */
+    {.x = 1, .y = -1, .z = 1 }, /* 6 */
+    {.x = -1, .y = 1, .z = 1 }, /* 7 */
+    {.x = -1, .y = -1, .z = 1 }  /* 8 */
+};
+
+/* Cube faces */
+Face cubeFaces[N_CUBE_FACES] = {
+    /* front */
+    {.a = 1, .b = 2, .c = 3, .pattern = BayerDither02 },
+    {.a = 1, .b = 3, .c = 4, .pattern = BayerDither02 },
+    /* right */
+    {.a = 4, .b = 3, .c = 5, .pattern = BayerDither05 },
+    {.a = 4, .b = 5, .c = 6, .pattern = BayerDither05 },
+    /* back */
+    {.a = 6, .b = 5, .c = 7, .pattern = BayerDither08 },
+    {.a = 6, .b = 7, .c = 8, .pattern = BayerDither08 },
+    /* left */
+    {.a = 8, .b = 7, .c = 2, .pattern = BayerDither11 },
+    {.a = 8, .b = 2, .c = 1, .pattern = BayerDither11 },
+    /* top */
+    {.a = 2, .b = 7, .c = 5, .pattern = BayerDither14 },
+    {.a = 2, .b = 5, .c = 3, .pattern = BayerDither14 },
+    /* bottom */
+    {.a = 6, .b = 8, .c = 1, .pattern = BayerDither16 },
+    {.a = 6, .b = 1, .c = 4, .pattern = BayerDither16 }
+};
 
 // Custom readline function
 int readline(SDFile* file, char* buffer, int maxLength)
@@ -30,6 +69,33 @@ int readline(SDFile* file, char* buffer, int maxLength)
     buffer[bytesRead] = '\0';
 
     return bytesRead;
+}
+
+Mesh* loadCubeMeshData(void)
+{
+    Mesh* mesh = (Mesh*)pdMalloc(sizeof(Mesh));
+	if (!mesh)
+	{
+		LOG_ERROR("Failed to allocate memory for mesh");
+		return NULL;
+	}
+
+    mesh->vertices = NULL; // Initialize vertices array
+    mesh->faces = NULL;    // Initialize faces array
+	mesh->rotation = (Vector3D){ 0.0f, 0.0f, 0.0f };
+
+    for (int i = 0; i < N_CUBE_VERTICES; i++)
+    {
+        Vector3D cubeVertex = cubeVertices[i];
+        arrput(mesh->vertices, cubeVertex);
+    }
+    for (int i = 0; i < N_CUBE_FACES; i++)
+    {
+        Face cubeFace = cubeFaces[i];
+        arrput(mesh->faces, cubeFace);
+    }
+
+	return mesh;
 }
 
 Mesh* loadOBJ(const char* filename)
@@ -85,9 +151,9 @@ Mesh* loadOBJ(const char* filename)
             // OBJ indices are 1-based, convert to 0-based
             Face face =
             {
-                .a = vertexIndices[0] - 1,
-                .b = vertexIndices[1] - 1,
-                .c = vertexIndices[2] - 1
+                .a = vertexIndices[0],
+                .b = vertexIndices[1],
+                .c = vertexIndices[2]
             };
             arrput(mesh->faces, face);
         }

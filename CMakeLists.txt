@@ -3,6 +3,7 @@ set(CMAKE_C_STANDARD 90)
 
 # Find Playdate SDK
 set(ENVSDK $ENV{PLAYDATE_SDK_PATH})
+
 if (NOT ${ENVSDK} STREQUAL "")
     # Convert path from Windows
     file(TO_CMAKE_PATH ${ENVSDK} SDK)
@@ -15,6 +16,7 @@ else()
             OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 endif()
+
 if (NOT EXISTS ${SDK})
     message(FATAL_ERROR "SDK Path not found; set ENV value PLAYDATE_SDK_PATH")
     return()
@@ -43,6 +45,7 @@ set(HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/mesh.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/include/vector.h
+    #${CMAKE_CURRENT_SOURCE_DIR}/Source/include/patterns.h
 )
 
 # Explicitly list source files

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "pd_api.h"
 #include "memory.h"
@@ -27,7 +28,7 @@ LCDFont* font = NULL;
 
 /* Mesh to be loaded from file */
 static Mesh* mesh = NULL;
-static float rotationX = 0.f, rotationY = 0.f, rotationZ = 0.f;
+static float rotationX = 0.02f, rotationY = 0.02f, rotationZ = 0.04f;
 
 /* Camera position and cube rotation angles */
 Vector3D cameraPosition = { .x = 0.f, .y = 0.f, .z = 0.f };
@@ -39,17 +40,32 @@ Triangle2D* trianglesToRender = NULL;
 static void initialize(void);
 static int update(void* userdata);
 
+/* Compare function for qsort to sort triangles by average depth */
+int triangleAvgDepthCompare(const void* a, const void* b)
+{
+    const Triangle2D* triangleA = (const Triangle2D*)a;
+    const Triangle2D* triangleB = (const Triangle2D*)b;
+
+    if (triangleA->avgDepth < triangleB->avgDepth) return -1;
+    if (triangleA->avgDepth > triangleB->avgDepth) return 1;
+    return 0;
+}
+
 /* Application setup and initialization */
 void setup(void)
 {
     initDisplay();
 
-    mesh = loadOBJ("assets/obj/cube.obj");
+    renderMode = kRenderWireframe;
+    cullingMode = kCullingBackface;
+
+    mesh = loadCubeMeshData();
+    /*mesh = loadOBJ("assets/obj/cube.obj");
     if (mesh == NULL)
     {
         LOG_ERROR("Failed to load cube mesh");
         return;
-    }
+    }*/
 }
 
 /* Process input from the user */
@@ -59,31 +75,52 @@ void processInput(void)
     PDButtons released;
     pd->system->getButtonState(&current, NULL, &released);
 
-    if (current & kButtonLeft)
-        rotationY -= 0.05f;
-    if (current & kButtonRight)
-        rotationY += 0.05f;
-    if (current & kButtonUp)
-        rotationX -= 0.05f;
-    if (current & kButtonDown)
-        rotationX += 0.05f;
-    if (current & kButtonA)
-        rotationZ -= 0.05f;
-    if (current & kButtonB)
-        rotationZ += 0.05f;
-
-    if (released & kButtonLeft)
-        rotationY = 0.f;
     if (released & kButtonRight)
-        rotationY = 0.f;
+    {
+        if (renderMode == kRenderSolidWireframe) 
+        {
+			renderMode = kRenderWireframe;
+		}
+		else
+		{
+			renderMode++;
+        }
+    }
+    if (released & kButtonLeft)
+    {
+        if (renderMode == kRenderWireframe)
+        {
+            renderMode = kRenderSolidWireframe;
+		}
+		else
+		{
+			renderMode--;
+		}
+    }
+
+	if (released & kButtonDown)
+	{
+		if (cullingMode == kCullingNone)
+		{
+			cullingMode = kCullingBackface;
+		}
+		else
+		{
+			cullingMode--;
+		}
+	}
+
     if (released & kButtonUp)
-        rotationX = 0.f;
-    if (released & kButtonDown)
-        rotationX = 0.f;
-    if (released & kButtonA)
-        rotationZ = 0.f;
-    if (released & kButtonB)
-        rotationZ = 0.f;
+	{
+		if (cullingMode == kCullingBackface)
+		{
+			cullingMode = kCullingNone;
+		}
+		else
+		{
+			cullingMode++;
+		}
+	}
 }
 
 /* Project a 3D point to 2D space */
@@ -106,9 +143,9 @@ void gameUpdate(void)
         // Get the vertices that make up the current face
         Face meshFace = mesh->faces[i];
         Vector3D faceVertices[3];
-        faceVertices[0] = mesh->vertices[meshFace.a];
-        faceVertices[1] = mesh->vertices[meshFace.b];
-        faceVertices[2] = mesh->vertices[meshFace.c];
+        faceVertices[0] = mesh->vertices[meshFace.a - 1];
+        faceVertices[1] = mesh->vertices[meshFace.b - 1];
+        faceVertices[2] = mesh->vertices[meshFace.c - 1];
 
         Vector3D transformedVertices[3];
 
@@ -129,50 +166,65 @@ void gameUpdate(void)
             transformedVertices[j] = transformedVertex;
         }
 
-        // Check backface culling
-        Vector3D vectorA = transformedVertices[0]; /*   A   */
-        Vector3D vectorB = transformedVertices[1]; /*  / \  */
-        Vector3D vectorC = transformedVertices[2]; /* C---B */
-
-        // Get the vector subtraction of B-A and C-A
-        Vector3D vectorAB = vector3DSub(vectorB, vectorA);
-        Vector3D vectorAC = vector3DSub(vectorC, vectorA);
-        vectorAB = vector3DNormalize(vectorAB);
-        vectorAC = vector3DNormalize(vectorAC);
-
-        // Compute the face normal (using cross product to find perpendicular)
-        Vector3D normal = vector3DCross(vectorAB, vectorAC);
-        normal = vector3DNormalize(normal);
-
-        // Find the vector between a point in the triangle and the camera origin
-        Vector3D cameraRay = vector3DSub(cameraPosition, vectorA);
-
-        // Calculate how aligned the camera ray is with the face normal (using dot product)
-        float dotNormalCamera = vector3DDot(normal, cameraRay);
-
-        // Bypass the triangles that are looking away from the camera
-        if (dotNormalCamera < 0)
+        if (cullingMode == kCullingBackface)
         {
-            continue;
+            // Check backface culling
+            Vector3D vectorA = transformedVertices[0]; /*   A   */
+            Vector3D vectorB = transformedVertices[1]; /*  / \  */
+            Vector3D vectorC = transformedVertices[2]; /* C---B */
+
+            // Get the vector subtraction of B-A and C-A
+            Vector3D vectorAB = vector3DSub(vectorB, vectorA);
+            Vector3D vectorAC = vector3DSub(vectorC, vectorA);
+            vectorAB = vector3DNormalize(vectorAB);
+            vectorAC = vector3DNormalize(vectorAC);
+
+            // Compute the face normal (using cross product to find perpendicular)
+            Vector3D normal = vector3DCross(vectorAB, vectorAC);
+            normal = vector3DNormalize(normal);
+
+            // Find the vector between a point in the triangle and the camera origin
+            Vector3D cameraRay = vector3DSub(cameraPosition, vectorA);
+
+            // Calculate how aligned the camera ray is with the face normal (using dot product)
+            float dotNormalCamera = vector3DDot(normal, cameraRay);
+
+            // Bypass the triangles that are looking away from the camera
+            if (dotNormalCamera < 0)
+            {
+                continue;
+            }
         }
 
-        Triangle2D projectedTriangle;
+        Vector2D projectedPoints[3];
 
         for (int j = 0; j < 3; j++)
         {
             // Project the current vertex
-            Vector2D projectedPoint = project(transformedVertices[j]);
+            projectedPoints[j] = project(transformedVertices[j]);
 
             // Scale and translate the projected points to the middle of the screen
-            projectedPoint.x += (pd->display->getWidth() * 0.5f);
-            projectedPoint.y += (pd->display->getHeight() * 0.5f);
+            projectedPoints[j].x += (pd->display->getWidth() * 0.5f);
+            projectedPoints[j].y += (pd->display->getHeight() * 0.5f);
 
-            projectedTriangle.points[j] = projectedPoint;
         }
+
+        Triangle2D projectedTriangle = {
+            .points = {
+                { projectedPoints[0].x, projectedPoints[0].y },
+                { projectedPoints[1].x, projectedPoints[1].y },
+                { projectedPoints[2].x, projectedPoints[2].y }
+            },
+			.pattern = meshFace.pattern,
+			.avgDepth = (transformedVertices[0].z + transformedVertices[1].z + transformedVertices[2].z) / 3
+        };
 
         // Save the projected triangle in the array of triangles to render
         arrput(trianglesToRender, projectedTriangle);
     }
+
+    /* Sort the triangles to render by average depth */
+    qsort(trianglesToRender, arrlen(trianglesToRender), sizeof(Triangle2D), triangleAvgDepthCompare);
 }
 
 void render(void)
@@ -185,16 +237,37 @@ void render(void)
         // Extract vertices for the current triangle
         Triangle2D triangle = trianglesToRender[i];
 
-        // Draw the triangle
-        drawFilledTriangle(triangle.points[0].x, triangle.points[0].y, 
-                           triangle.points[1].x, triangle.points[1].y,
-                           triangle.points[2].x, triangle.points[2].y, 
-                           kColorWhite);
+        if (renderMode == kRenderSolid || renderMode == kRenderSolidWireframe)
+        {
+            // Draw the triangle
+            drawFilledTriangle(
+                triangle.points[0].x, triangle.points[0].y,
+                triangle.points[1].x, triangle.points[1].y,
+                triangle.points[2].x, triangle.points[2].y,
+                kColorWhite);
+        }
+        
+        if (renderMode == kRenderWireframe || renderMode == kRenderSolidWireframe || renderMode == kRenderWireframeVertex) 
+        {
+			LCDColor color = kColorWhite;
+            if (renderMode == kRenderSolidWireframe)
+            {
+				color = kColorBlack;
+            }
 
-        drawTriangle(triangle.points[0].x, triangle.points[0].y,
-                     triangle.points[1].x, triangle.points[1].y,
-                     triangle.points[2].x, triangle.points[2].y,
-                     kColorBlack);
+            drawTriangle(
+                triangle.points[0].x, triangle.points[0].y,
+                triangle.points[1].x, triangle.points[1].y,
+                triangle.points[2].x, triangle.points[2].y,
+                color);
+        }
+
+		if (renderMode == kRenderWireframeVertex)
+		{
+			drawRect(triangle.points[0].x - 2, triangle.points[0].y - 2, 4, 4, kColorWhite);
+			drawRect(triangle.points[1].x - 2, triangle.points[1].y - 2, 4, 4, kColorWhite);
+			drawRect(triangle.points[2].x - 2, triangle.points[2].y - 2, 4, 4, kColorWhite);
+		}
     }
 
     // Update the Playdate display

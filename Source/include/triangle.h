@@ -15,6 +15,7 @@
 typedef struct
 {
     int a, b, c;        /* Vertex indices */
+	LCDPattern* pattern;  /* Pattern to use for this face */
     //int uva, uvb, uvc;  /* Texture coordinate indices */
 } Face;
 
@@ -26,6 +27,8 @@ typedef struct
 typedef struct
 {
     Vector2D points[3];  /* The three points of the triangle */
+	LCDPattern* pattern;  /* Pattern to use for this triangle */
+	float avgDepth;      /* Average depth of the triangle */
 } Triangle2D;
 
 #endif /* TRIANGLE_H */

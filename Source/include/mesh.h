@@ -14,6 +14,13 @@ typedef struct {
 } Mesh;
 
 /**
+ * @brief Loads mesh data for a cube.
+ * 
+ * @return Mesh* Pointer to the loaded mesh.
+ */
+Mesh* loadCubeMeshData(void);
+
+/**
  * @brief Loads mesh data from an OBJ file.
  *
  * @param filename The name of the OBJ file to load.
